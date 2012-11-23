@@ -9,7 +9,7 @@ public class SaltoCaballo {
 	 */
 	
 	//Variables de tipo miembro pœblico
-	Integer N; //Dimensi—n del tablero de Ajedrez.
+	static Integer N; //Dimensi—n del tablero de Ajedrez.
 	Integer xInicio; //Posici—n x inicial
 	Integer yInicio; //Posici—n y inicial
 	Boolean modoTraza; //Establece si tenemos que imprimir todos los estados por los que pasa el tablero.
@@ -30,13 +30,42 @@ public class SaltoCaballo {
 				System.exit(0);
 			}
 		
+		// 2 - configuraci—n temporal de par‡metros de entrada
+				
+		//Creaci—n de la partida
+		N=16;
+		EstadoPartida Partida=new EstadoPartida(3,3,16);
+		Partida.PintarTablero();
 
 	}
 	
 	public static Boolean evalParametros(String[] args)
 	{
-		return false;
+		//TODO Implementar la gesti—n de par‡metros
+		return true;
 	}
+	
+	public EstadoPartida genCamino()
+	{
+		//TODO Implementar la funci—n recursiva principal de BackTracking
+		return new EstadoPartida();
+		
+	}
+	
+	public EstadoPartida[] getCompleciones()
+	{
+		//TODO Establecer la lista de Compleciones
+		return new EstadoPartida[1]; //Temporal
+		
+	}
+	
+	public boolean evalCondicionesPoda()
+	{
+		//
+		return true;
+		
+	}
+
 	
 	
 
