@@ -51,9 +51,9 @@ public class EstadoPartida
 		//Establezco la primera posici—n del caballo en el tablero
 		Tablero[xActual][yActual]=1;
 		dimTablero=dim; //Establezco la dimensi—n del Tablero
-		Camino=new Casilla[dim]; //Genero un nuevo array de tipo Casilla
+		Camino=new Casilla[dim*dim]; //Genero un nuevo array de tipo Casilla
 		//Crear todas las casillas del array Camino.
-		for (idx=0;idx<dim;idx++)
+		for (idx=0;idx<(dim*dim);idx++)
 		{
 			Camino[idx]=new Casilla(); //Genero la lista de casillas inicial
 		}
@@ -83,7 +83,38 @@ public class EstadoPartida
 		
 	}
 	
-	//TODO Implementar la funci—n que pinta el tablero por consola
+	public Casilla[] copiaCamino()
+	{
+		int x;
+		Casilla tCamino[];
+		tCamino=new Casilla[dimTablero*dimTablero];
+		for (x=0;x<(dimTablero*dimTablero);x++)
+		{
+			tCamino[x]=new Casilla(Camino[x].xPos, Camino[x].yPos);
+	
+		}
+			return tCamino;
+	}
+	
+	public int[][] copiaTablero()
+	{
+		//variables temporales;
+				int x,y;
+				int tTablero[][];
+				tTablero=new int[dimTablero][dimTablero];
+				for (x=0;x<dimTablero;x++) //lo recorro al revŽs para representar que el eje y crece de abajo a arriba y no de arriba a abajo 
+				{
+					for (y=0;y<dimTablero;y++)
+					{
+						tTablero[x][y]=Tablero[x][y];
+						
+					}
+					
+				}
+				return tTablero;
+	}
+	
+	
 	
 	public void PintarTablero()
 	{
@@ -110,10 +141,17 @@ public class EstadoPartida
 			}
 			miConsola.println(); //Salto de Linea	
 		}
+	}
 	
-		
-		
-	}	
+	public void PintarCamino()
+	{
+		int x;
+		for (x=0;x<(dimTablero*dimTablero);x++)
+		{
+			miConsola.println("Posici—n " + Integer.toString(x+1) + ": x=" + Integer.toString(Camino[x].xPos) + " , y=" + Integer.toString(Camino[x].yPos));
+
+		}
+	}
 	
 	
 }

@@ -1,5 +1,6 @@
 
 import java.lang.*;
+import java.util.ArrayList;
 import java.io.*;
 
 public class SaltoCaballo {
@@ -21,7 +22,7 @@ public class SaltoCaballo {
 	public static void main(String[] args) throws UnsupportedEncodingException 
 	{
 		miConsola=new PrintStream(System.out,true,"UTF-8");
-		
+				
 		// 1 - Evaluar que los par‡metros enviados son los correctos.
 		if (evalParametros(args)==false)
 			{
@@ -33,9 +34,17 @@ public class SaltoCaballo {
 		// 2 - configuraci—n temporal de par‡metros de entrada
 				
 		//Creaci—n de la partida
-		N=16;
-		EstadoPartida Partida=new EstadoPartida(3,3,16);
+		N=5;
+		EstadoPartida Partida=new EstadoPartida(3,3,5);
+		
+		Partida.PintarCamino(); 
 		Partida.PintarTablero();
+		
+		genCompleciones(Partida);
+		Partida.PintarCamino();
+		
+		
+		
 
 	}
 	
@@ -52,10 +61,49 @@ public class SaltoCaballo {
 		
 	}
 	
-	public EstadoPartida[] getCompleciones()
+	public static ArrayList<EstadoPartida> genCompleciones(EstadoPartida EstActual)
 	{
-		//TODO Establecer la lista de Compleciones
-		return new EstadoPartida[1]; //Temporal
+
+		//Variables locales
+		int x,y;
+		//Lista de Estados siguientes
+		ArrayList<EstadoPartida> ListaEstadosSiguientes = new ArrayList<EstadoPartida>();
+		x=EstActual.xActual;
+		y=EstActual.yActual;
+		//Realizo la comprobaci—n y llamada de las 8 posibles posiciones 
+		genNuevoJuego(x-2,y-1,ListaEstadosSiguientes,EstActual);
+		genNuevoJuego(x-1,y-2,ListaEstadosSiguientes,EstActual);
+		genNuevoJuego(x-2,y+1,ListaEstadosSiguientes,EstActual);
+		genNuevoJuego(x-1,y+2,ListaEstadosSiguientes,EstActual);
+		genNuevoJuego(x+2,y-1,ListaEstadosSiguientes,EstActual);
+		genNuevoJuego(x+1,y-2,ListaEstadosSiguientes,EstActual);
+		genNuevoJuego(x+2,y+1,ListaEstadosSiguientes,EstActual);
+		genNuevoJuego(x+1,y+2,ListaEstadosSiguientes,EstActual);
+		return ListaEstadosSiguientes; //Temporal
+	}
+	
+	public static void genNuevoJuego(int x,int y,ArrayList<EstadoPartida> ListaEstadosSiguientes, EstadoPartida EstActual)
+	{
+		//Variables Locales
+		EstadoPartida nuevoEstadoPartida;
+		
+		//Comprobar que las nuevas posiciones est‡n dentro del tablero
+		if ((x>=0) && (y>=0) && (x<=EstActual.dimTablero-1) && (y<=EstActual.dimTablero-1)) 
+		{
+			nuevoEstadoPartida=new EstadoPartida(x+1,y+1,EstActual.dimTablero);
+			nuevoEstadoPartida.Tablero=EstActual.copiaTablero();
+			nuevoEstadoPartida.Camino=EstActual.copiaCamino();
+			nuevoEstadoPartida.lCamino=EstActual.lCamino+1;
+			nuevoEstadoPartida.Camino[nuevoEstadoPartida.lCamino-1].xPos=x;
+			nuevoEstadoPartida.Camino[nuevoEstadoPartida.lCamino-1].yPos=y;
+			nuevoEstadoPartida.Tablero[x][y]=nuevoEstadoPartida.lCamino;
+			ListaEstadosSiguientes.add(nuevoEstadoPartida);
+			System.out.println();
+			nuevoEstadoPartida.PintarTablero();
+			nuevoEstadoPartida=null;
+			
+		}
+		return;
 		
 	}
 	
