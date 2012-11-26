@@ -1,5 +1,7 @@
 import java.io.PrintStream;
+
 import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
 
 
 
@@ -13,6 +15,7 @@ public class EstadoPartida
 	public int xActual;
 	public int yActual;
 	public int dimTablero;
+	public boolean esSolucion;
 	
 	private  PrintStream miConsola;
 	
@@ -79,8 +82,41 @@ public class EstadoPartida
 	public void initEstadoPartida()	throws UnsupportedEncodingException
 	{
 		//Funci—n que focaliza todo lo comœn a los diferentes constructores
+		esSolucion=false;
 		miConsola=new PrintStream(System.out,true,"UTF-8");
 		
+	}
+	
+	public EstadoPartida evalPartida(ArrayList<EstadoPartida> ListaSoluciones)
+	{
+		//variables locales
+		int x;
+		//Salida en caso de camino v‡lido. Si el camino obtenido corresponde con el tama–o del tablero, es que hemos
+		//ocupado todas las posiciones.
+		if (lCamino==dimTablero*dimTablero)
+			{
+				esSolucion=true;
+				ListaSoluciones.add(this);
+				return this;
+			}
+		else
+			//Obtenci—n de siguientes ensayos
+		{
+			//Array para la obtenci—n de las siguientes posiciones disponibles
+			ArrayList<EstadoPartida> ListaEstadosSiguientes;
+			ListaEstadosSiguientes=SaltoCaballo.genCompleciones(this);
+			x=0;
+			while (x<ListaEstadosSiguientes.size()) //realizamos este recorrido mientras tenga ensayos que cumplan
+			{
+				ListaEstadosSiguientes.get(x).evalPartida(ListaSoluciones); 
+				x++;
+				
+			}
+			
+		}
+			esSolucion=false;
+			return this;
+	
 	}
 	
 	public Casilla[] copiaCamino()
