@@ -14,6 +14,8 @@ public class EstadoPartida
 	public int lCamino;
 	public int xActual;
 	public int yActual;
+	public boolean modoTraza;
+	public boolean modotodasSoluciones;
 	public int dimTablero;
 	public boolean esSolucion;
 	
@@ -32,7 +34,7 @@ public class EstadoPartida
 		
 	}
 	
-	public EstadoPartida(int xIni,int yIni, int dim)	
+	public EstadoPartida(int xIni,int yIni, int dim, Boolean mTraza, Boolean tSoluciones)	
 	{
 		//VARIABLES TEMPORALES
 		int idx;
@@ -42,6 +44,8 @@ public class EstadoPartida
 				
 		xActual=xIni-1; //Posici—n x de partida. Resto -1 para adaptarlo a matriz con ’ndice que empieza en 0.  
 		yActual=yIni-1; //Posici—n y de partida. Resto -1 para adaptarlo a matriz con ’ndice que empieza en 0.
+		modoTraza=mTraza;
+		modotodasSoluciones=tSoluciones;
 		Tablero=new int[dim][dim]; //Creaci—n de la matriz que representa el tablero;
 		//Inicializar el Tablero todo a 0.
 		for (idx=0;idx<dim;idx++)
@@ -84,11 +88,11 @@ public class EstadoPartida
 		//Funci—n que focaliza todo lo comœn a los diferentes constructores
 		esSolucion=false;
 		miConsola=new PrintStream(System.out,true,"UTF-8");
-		
 	}
 	
 	public EstadoPartida evalPartida(ArrayList<EstadoPartida> ListaSoluciones)
 	{
+		//TODO implementar que la funci—n retorne cuando el par. de entrada sea el de una œnica soluci—n.
 		//variables locales
 		int x;
 		//Salida en caso de camino v‡lido. Si el camino obtenido corresponde con el tama–o del tablero, es que hemos
@@ -102,19 +106,26 @@ public class EstadoPartida
 		else
 			//Obtenci—n de siguientes ensayos
 		{
-			//Array para la obtenci—n de las siguientes posiciones disponibles
-			ArrayList<EstadoPartida> ListaEstadosSiguientes;
-			ListaEstadosSiguientes=SaltoCaballo.genCompleciones(this);
-			x=0;
-			while (x<ListaEstadosSiguientes.size()) //realizamos este recorrido mientras tenga ensayos que cumplan
+			if ((ListaSoluciones.size()==1 && modotodasSoluciones==false)!=true) //He encontrado una soluci—n y solo quiero una. Ya no necesito continuar
 			{
-				ListaEstadosSiguientes.get(x).evalPartida(ListaSoluciones); 
-				x++;
-				
+			
+				//Array para la obtenci—n de las siguientes posiciones disponibles
+				ArrayList<EstadoPartida> ListaEstadosSiguientes;
+				ListaEstadosSiguientes=SaltoCaballo.genCompleciones(this);
+				x=0;
+				while (x<ListaEstadosSiguientes.size()) //realizamos este recorrido mientras tenga ensayos que cumplan
+				{
+					ListaEstadosSiguientes.get(x).evalPartida(ListaSoluciones);
+					
+					if (ListaSoluciones.size()==1  && modotodasSoluciones==false) break;// SI HE ENCONTRADO UNA SOLUCIîN ROMPO EL BUCLE PARA SALIR LO ANTES POSIBLE
+						
+					x++;
+					
+				}
 			}
 			
+			
 		}
-			esSolucion=false;
 			return this;
 	
 	}
@@ -188,6 +199,8 @@ public class EstadoPartida
 
 		}
 	}
+	
+
 	
 	
 }
