@@ -1,7 +1,11 @@
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.PrintStream;
 
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
+import java.util.Date;
 
 
 
@@ -18,8 +22,7 @@ public class EstadoPartida
 	public boolean modotodasSoluciones;
 	public int dimTablero;
 	public boolean esSolucion;
-	
-	private  PrintStream miConsola;
+	public  PrintStream miConsola;
 	
 	public EstadoPartida()	
 	{
@@ -31,10 +34,15 @@ public class EstadoPartida
 		{
 			System.out.println(exc.toString());
 		}
+		catch (FileNotFoundException exc)
+		{
+			// TODO Auto-generated catch block
+			System.out.println(exc.toString());
+		}
 		
 	}
 	
-	public EstadoPartida(int xIni,int yIni, int dim, Boolean mTraza, Boolean tSoluciones)	
+	public EstadoPartida(int xIni,int yIni, int dim, Boolean mTraza, Boolean tSoluciones,PrintStream miConsola)	
 	{
 		//VARIABLES TEMPORALES
 		int idx;
@@ -46,6 +54,7 @@ public class EstadoPartida
 		yActual=yIni-1; //Posici—n y de partida. Resto -1 para adaptarlo a matriz con ’ndice que empieza en 0.
 		modoTraza=mTraza;
 		modotodasSoluciones=tSoluciones;
+		this.miConsola=miConsola;
 		Tablero=new int[dim][dim]; //Creaci—n de la matriz que representa el tablero;
 		//Inicializar el Tablero todo a 0.
 		for (idx=0;idx<dim;idx++)
@@ -66,8 +75,8 @@ public class EstadoPartida
 		}
 		
 		// Inicializo la primera posici—n del camino actual
-		Camino[0].xPos=xIni;
-		Camino[0].yPos=yIni;
+		Camino[0].xPos=xIni-1; //LO ESTABLEZCO SOBRE INDICE 0, NO êNDICE 1
+		Camino[0].yPos=yIni-1;
 		//Inicializo la longitud inicial del camino
 		lCamino=1;
 		//llamada al constructor por defecto
@@ -77,17 +86,29 @@ public class EstadoPartida
 		}
 		catch (UnsupportedEncodingException exc)
 		{
-			System.out.println(exc.toString());
+			miConsola.println(exc.toString());
+		} 
+		catch (FileNotFoundException exc)
+		{
+			// TODO Auto-generated catch block
+			miConsola.println(exc.toString());
 		}
 		
 		
 	}
 	
-	public void initEstadoPartida()	throws UnsupportedEncodingException
+	public void initEstadoPartida()	throws UnsupportedEncodingException, FileNotFoundException
 	{
 		//Funci—n que focaliza todo lo comœn a los diferentes constructores
 		esSolucion=false;
+		/*
+		//FICHERO PARA GRABAR LA SALIDA
+		File file = new File("salida.txt");
+		FileOutputStream fos = new FileOutputStream(file);
+		//miConsola=new PrintStream(fos,true,"UTF-8");
 		miConsola=new PrintStream(System.out,true,"UTF-8");
+		*/
+		
 	}
 	
 	public EstadoPartida evalPartida(ArrayList<EstadoPartida> ListaSoluciones)
@@ -101,6 +122,8 @@ public class EstadoPartida
 			{
 				esSolucion=true;
 				ListaSoluciones.add(this);
+				Date fechaHora=new Date(); 
+				miConsola.println(fechaHora.toString() + " Soluci—n Obtenida n¼: " +Integer.toString(ListaSoluciones.size()));
 				return this;
 			}
 		else

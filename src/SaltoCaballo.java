@@ -1,7 +1,7 @@
 
-import java.lang.*;
 import java.util.ArrayList;
 import java.io.*;
+import java.util.Date;;
 
 public class SaltoCaballo {
 
@@ -20,7 +20,7 @@ public class SaltoCaballo {
 	//Otras variables
 	static PrintStream miConsola;
 	
-	public static void main(String[] args) throws UnsupportedEncodingException 
+	public static void main(String[] args) throws UnsupportedEncodingException, FileNotFoundException 
 	{
 		
 		//variables temporales
@@ -33,9 +33,13 @@ public class SaltoCaballo {
 		modoTraza=false;
 		modoTodasSoluciones=false; 
 		
-		
+		//FICHERO PARA GRABAR LA SALIDA
+		File file = new File("salida.txt");
+		FileOutputStream fos = new FileOutputStream(file);
+		//miConsola=new PrintStream(fos,true,"UTF-8");
 		miConsola=new PrintStream(System.out,true,"UTF-8");
-				
+		Date fechaHora=new Date();
+					
 		// 1 - Evaluar que los parámetros enviados son los correctos.
 		if (evalParametros(args)==false)
 			{
@@ -48,47 +52,47 @@ public class SaltoCaballo {
 				
 		//Creación de la partida
 		listaSoluciones= new ArrayList<EstadoPartida>();
-		EstadoPartida estadoInicial=new EstadoPartida(xInicio,yInicio,N,modoTraza,modoTodasSoluciones);
+		EstadoPartida estadoInicial=new EstadoPartida(xInicio,yInicio,N,modoTraza,modoTodasSoluciones,miConsola);
+		miConsola.println(fechaHora.toString() + " Comienza el Proceso de generación de soluciones: ");
 		estadoInicial.evalPartida(listaSoluciones);
+		miConsola.println(fechaHora.toString() + " Finaliza el Proceso de generación de soluciones");
 		
 		//FINALIZAR EL PROGRAMA SI NO HEMOS ENCONTRADO SOLUCIONES
 		if (listaSoluciones.size()==0)
 		{
-			miConsola.println("No se han encontrado soluciones. El programa finalizará su ejecución.");
+			miConsola.println(fechaHora.toString() + " No se han encontrado soluciones. El programa finalizará su ejecución.");
 			System.exit(0);
 		
 		}
 		
-		if (modoTodasSoluciones) //TENGO QUE IMPRIMIR TO-DO EL ARRAY DE SOLUCIONES
-		{
+		miConsola.println( fechaHora.toString() + " Comienza el proceso de listado de soluciones ");
 		
-			for (x=0;x<listaSoluciones.size();x++)
+		for (x=0;x<listaSoluciones.size();x++)
+		{
+			miConsola.println(fechaHora.toString() +  " Solución Nº : " + Integer.toString(x+1) );
+			miConsola.println("----------------------------------------------------------");
+			
+			if (modoTraza)
 			{
-				if (modoTraza)
-				{
-					
-				}
-				else
-				{
-					listaSoluciones.get(x).PintarTablero();	
-				}
+				miConsola.println(fechaHora.toString() +  " Detalle de la traza");
+				miConsola.println("----------------------------------------------------------");
+				PintarSolucion(listaSoluciones.get(x));
+			}
+			else
+			{
+				
+				
+				listaSoluciones.get(x).PintarTablero();
+				miConsola.println();
+				listaSoluciones.get(x).PintarCamino();
 				
 			}
+			
+			miConsola.println();
+			
 		}
-		else
-		{
-			if (listaSoluciones.size()!=0) //QUE POR LO MENOS HAYA UNA SOLUCIÓN
-			{
-				if (modoTraza)
-				{
-					
-				}
-				else
-				{
-					listaSoluciones.get(0).PintarTablero();
-				}
-			}
-		}
+		
+		miConsola.println(fechaHora.toString() +  " Finaliza el proceso de listado de soluciones ");
 		
 
 
@@ -98,40 +102,56 @@ public class SaltoCaballo {
 	{
 		
 		//variables temporales;
-		int xcamino,x,y;
+		int xcamino,xcaminotmp, x,y;
+		boolean encontrado;
 		
 		//RECORRO TO-DO EL CAMINO QUE REPRESENTA LA SOLUCIÓN
 		for (xcamino=0;xcamino<solPartida.Camino.length;xcamino++)
 		{
+			xcaminotmp=0;
+			miConsola.println("----------------------------------------------------------");
 			
 			for (x=N-1;x>=0;x--) //lo recorro al revés para representar que el eje y crece de abajo a arriba y no de arriba a abajo 
 			{
 				for (y=0;y<N;y++)
 				{
-					if (solPartida.Camino[xcamino].xPos==x && solPartida.Camino[xcamino].yPos==y)
+					encontrado=false;
+					
+					for (xcaminotmp=0;xcaminotmp<=xcamino;xcaminotmp++) //CADA VEZ RECORREMOS EL CAMINO DESDE EL PRINCIPIO HASTA LA POSICIÓN EVALUADA
 					{
-						if ((xcamino++)>9)
+						
+						
+						
+						if (solPartida.Camino[xcaminotmp].xPos==x && solPartida.Camino[xcaminotmp].yPos==y)
 						{
-							miConsola.print(Integer.toString(xcamino++));
+							encontrado=true;
+							if ((xcaminotmp+1)>9)
+							{
+								miConsola.print(Integer.toString(xcaminotmp+1));
+							}
+							else
+							{
+								miConsola.print(" " + Integer.toString(xcaminotmp+1));
+							}
+							//miConsola.print(Integer.toString(xcamino+1));
 						}
-						else
-						{
-							miConsola.print(" " + Integer.toString(xcamino++));
-						}
-						miConsola.print(Integer.toString(xcamino++));
+								
+						
 					}
-					else
+					
+					if (encontrado==false) // si no lo he encontrado genero espacio en dicha posición
 					{
 						miConsola.print("  " );
 					}
-					
 					if (y!=N)
-						{
-							miConsola.print("\t");
-							
-						}
+					{
+						miConsola.print("\t");
+						
+					}
 				}
-				miConsola.println(); //Salto de Linea	
+				
+				miConsola.println(); //Salto de Linea
+			
 			}
 		}
 		
@@ -244,7 +264,7 @@ public class SaltoCaballo {
 		//Comprobar que las nuevas posiciones están dentro del tablero
 		if ((x>=0) && (y>=0) && (x<=EstActual.dimTablero-1) && (y<=EstActual.dimTablero-1) && (EstActual.Tablero[x][y] == 0))  
 		{
-			nuevoEstadoPartida=new EstadoPartida(x+1,y+1,EstActual.dimTablero,modoTraza,modoTodasSoluciones);
+			nuevoEstadoPartida=new EstadoPartida(x+1,y+1,EstActual.dimTablero,modoTraza,modoTodasSoluciones,miConsola);
 			nuevoEstadoPartida.Tablero=EstActual.copiaTablero();
 			nuevoEstadoPartida.Camino=EstActual.copiaCamino();
 			nuevoEstadoPartida.lCamino=EstActual.lCamino+1;
@@ -252,8 +272,6 @@ public class SaltoCaballo {
 			nuevoEstadoPartida.Camino[nuevoEstadoPartida.lCamino-1].yPos=y;
 			nuevoEstadoPartida.Tablero[x][y]=nuevoEstadoPartida.lCamino;
 			ListaEstadosSiguientes.add(nuevoEstadoPartida);
-			//System.out.println();
-			//nuevoEstadoPartida.PintarTablero();
 			nuevoEstadoPartida=null;
 			
 		}
