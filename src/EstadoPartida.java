@@ -1,11 +1,12 @@
-import java.io.File;
+
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.PrintStream;
 
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Date;
+
+import sun.management.counter.LongCounter;
 
 
 
@@ -23,6 +24,9 @@ public class EstadoPartida
 	public int dimTablero;
 	public boolean esSolucion;
 	public  PrintStream miConsola;
+	public int numPosValidas;
+	
+	
 	
 	public EstadoPartida()	
 	{
@@ -123,17 +127,25 @@ public class EstadoPartida
 				esSolucion=true;
 				ListaSoluciones.add(this);
 				Date fechaHora=new Date(); 
-				miConsola.println(fechaHora.toString() + " Solución Obtenida nº: " +Integer.toString(ListaSoluciones.size()));
+				miConsola.print(" --- " + fechaHora.toString() + " Sol " +Integer.toString(ListaSoluciones.size()));
+				SaltoCaballo.longCamino=0;
 				return this;
+				
 			}
 		else
 			//Obtención de siguientes ensayos
+			//
+			
 		{
-			if ((ListaSoluciones.size()==1 && modotodasSoluciones==false)!=true) //He encontrado una solución y solo quiero una. Ya no necesito continuar
+			if ((ListaSoluciones.size()==1 && modotodasSoluciones==false)!=true) //O TENGO UNA SOLUCIÓN Y SOLO QUIERO UNA O CONTINUO
 			{
 			
 				//Array para la obtención de las siguientes posiciones disponibles
 				ArrayList<EstadoPartida> ListaEstadosSiguientes;
+								
+				SaltoCaballo.longCamino=lCamino;//Actualizo el nuevo camino
+				miConsola.print(" - " + Integer.toString(lCamino));
+				//miConsola.print(" longCamino: " + Integer.toString(SaltoCaballo.longCamino));
 				ListaEstadosSiguientes=SaltoCaballo.genCompleciones(this);
 				x=0;
 				while (x<ListaEstadosSiguientes.size()) //realizamos este recorrido mientras tenga ensayos que cumplan
@@ -149,6 +161,7 @@ public class EstadoPartida
 			
 			
 		}
+			miConsola.println();
 			return this;
 	
 	}

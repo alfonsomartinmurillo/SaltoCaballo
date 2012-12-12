@@ -1,5 +1,6 @@
 
 import java.util.ArrayList;
+
 import java.io.*;
 import java.util.Date;;
 
@@ -16,6 +17,7 @@ public class SaltoCaballo {
 	static Boolean modoTraza; //Establece si tenemos que imprimir todos los estados por los que pasa el tablero.
 	static Boolean modoTodasSoluciones; //Establece si debemos de obtener todas las soluciones o únicamente la primera.
 	static ArrayList<EstadoPartida> listaSoluciones;
+	static int longCamino;
 	
 	//Otras variables
 	static PrintStream miConsola;
@@ -32,12 +34,13 @@ public class SaltoCaballo {
 		yInicio=1; 
 		modoTraza=false;
 		modoTodasSoluciones=false; 
+		longCamino=0;
 		
 		//FICHERO PARA GRABAR LA SALIDA
 		File file = new File("salida.txt");
 		FileOutputStream fos = new FileOutputStream(file);
-		//miConsola=new PrintStream(fos,true,"UTF-8");
-		miConsola=new PrintStream(System.out,true,"UTF-8");
+		miConsola=new PrintStream(fos,true,"UTF-8");
+		//miConsola=new PrintStream(System.out,true,"UTF-8");
 		Date fechaHora=new Date();
 					
 		// 1 - Evaluar que los parámetros enviados son los correctos.
@@ -233,28 +236,68 @@ public class SaltoCaballo {
 		
 	}
 	
+	//TODO generar tratamiento de excepciones para ver que está pasando
 	public static ArrayList<EstadoPartida> genCompleciones(EstadoPartida EstActual)
 	{
 
 		//Variables locales
-		int x,y;
-		//Lista de Estados siguientes
+		int x,y,z,umbral=8,idxUmbral=0;
 		ArrayList<EstadoPartida> ListaEstadosSiguientes = new ArrayList<EstadoPartida>();
-		x=EstActual.xActual;
-		y=EstActual.yActual;
-		//Realizo la comprobación y llamada de las 8 posibles posiciones 
+		ArrayList<EstadoPartida> ListaEstadosSiguientesOrden = new ArrayList<EstadoPartida>();
 		
-		genNuevoJuego(x-2,y-1,ListaEstadosSiguientes,EstActual);
-		genNuevoJuego(x-1,y-2,ListaEstadosSiguientes,EstActual);
-		genNuevoJuego(x-2,y+1,ListaEstadosSiguientes,EstActual);
-		genNuevoJuego(x-1,y+2,ListaEstadosSiguientes,EstActual);
-		genNuevoJuego(x+2,y-1,ListaEstadosSiguientes,EstActual);
-		genNuevoJuego(x+1,y-2,ListaEstadosSiguientes,EstActual);
-		genNuevoJuego(x+2,y+1,ListaEstadosSiguientes,EstActual);
-		genNuevoJuego(x+1,y+2,ListaEstadosSiguientes,EstActual);
+		try
+		{
+			//Lista de Estados siguientes
+			
+			x=EstActual.xActual;
+			y=EstActual.yActual;
+			
+			//Realizo la comprobación y llamada de las 8 posibles posiciones 
+			
+			genNuevoJuego(x-2,y-1,ListaEstadosSiguientes,EstActual);
+			genNuevoJuego(x-1,y-2,ListaEstadosSiguientes,EstActual);
+			genNuevoJuego(x-2,y+1,ListaEstadosSiguientes,EstActual);
+			genNuevoJuego(x-1,y+2,ListaEstadosSiguientes,EstActual);
+			genNuevoJuego(x+2,y-1,ListaEstadosSiguientes,EstActual);
+			genNuevoJuego(x+1,y-2,ListaEstadosSiguientes,EstActual);
+			genNuevoJuego(x+2,y+1,ListaEstadosSiguientes,EstActual);
+			genNuevoJuego(x+1,y+2,ListaEstadosSiguientes,EstActual);
+			
+			//ORDENAR LA LISTA DE ESTADOS SIGUIENTES EN FUNCIÓN DEL NÚMERO DE POSICIONES VÁLIDAS
+			while (ListaEstadosSiguientes.size()!=0)
+			{
+				for (z=0;z<ListaEstadosSiguientes.size();z++)
+				{
+					umbral=8;
+					idxUmbral=0;
+					if (ListaEstadosSiguientes.get(z).numPosValidas<=umbral) 
+					{
+						//almaceno el índice y el nuevo umbral
+						umbral=ListaEstadosSiguientes.get(z).numPosValidas;
+						idxUmbral=z;	
+					}
+				}
+				//una vez finaliza el bucle añado el nuevo elemento, que será el menor, y lo borro de la lista original
+				ListaEstadosSiguientesOrden.add(ListaEstadosSiguientes.get(idxUmbral));
+				ListaEstadosSiguientes.remove(idxUmbral);
+				
+			}
+			
+			
+			
+			
+			
+		} //FIN TRY
+		catch (Exception ex)
+		{
+			miConsola.println(ex.toString());
+		}
+		finally
+		{
+			return ListaEstadosSiguientesOrden; //Temporal
+		}
 		
-		return ListaEstadosSiguientes; //Temporal
-	}
+		}
 	
 	public static void genNuevoJuego(int x,int y,ArrayList<EstadoPartida> ListaEstadosSiguientes, EstadoPartida EstActual)
 	{
@@ -272,11 +315,33 @@ public class SaltoCaballo {
 			nuevoEstadoPartida.Camino[nuevoEstadoPartida.lCamino-1].yPos=y;
 			nuevoEstadoPartida.Tablero[x][y]=nuevoEstadoPartida.lCamino;
 			ListaEstadosSiguientes.add(nuevoEstadoPartida);
+			nuevoEstadoPartida.numPosValidas=getNumPosValidas(nuevoEstadoPartida);
 			nuevoEstadoPartida=null;
 			
 		}
 		return;
 		
+	}
+	
+	public static int getNumPosValidas(EstadoPartida estPartida)
+	
+	{
+		int numPosValidas=0;
+		int x,y;
+		x=estPartida.xActual;
+		y=estPartida.yActual;
+		
+		
+		if ((x-2>=0) && (y-1>=0) && (x-2<=estPartida.dimTablero-1) && (y-1<=estPartida.dimTablero-1) && (estPartida.Tablero[x-2][y-1] == 0)) numPosValidas++;
+		if ((x-1>=0) && (y-2>=0) && (x-1<=estPartida.dimTablero-1) && (y-2<=estPartida.dimTablero-1) && (estPartida.Tablero[x-1][y-2] == 0)) numPosValidas++;
+		if ((x-2>=0) && (y+1>=0) && (x-2<=estPartida.dimTablero-1) && (y+1<=estPartida.dimTablero-1) && (estPartida.Tablero[x-2][y+1] == 0)) numPosValidas++;
+		if ((x-1>=0) && (y+2>=0) && (x-1<=estPartida.dimTablero-1) && (y+2<=estPartida.dimTablero-1) && (estPartida.Tablero[x-1][y+2] == 0)) numPosValidas++;
+		if ((x+2>=0) && (y-1>=0) && (x+2<=estPartida.dimTablero-1) && (y-1<=estPartida.dimTablero-1) && (estPartida.Tablero[x+2][y-1] == 0)) numPosValidas++;
+		if ((x+1>=0) && (y-2>=0) && (x+1<=estPartida.dimTablero-1) && (y-2<=estPartida.dimTablero-1) && (estPartida.Tablero[x+1][y-2] == 0)) numPosValidas++;
+		if ((x+2>=0) && (y+1>=0) && (x+2<=estPartida.dimTablero-1) && (y+1<=estPartida.dimTablero-1) && (estPartida.Tablero[x+2][y+1] == 0)) numPosValidas++;
+		if ((x+1>=0) && (y+2>=0) && (x+1<=estPartida.dimTablero-1) && (y+2<=estPartida.dimTablero-1) && (estPartida.Tablero[x+1][y+2] == 0)) numPosValidas++;
+
+		return numPosValidas;
 	}
 	
 	public boolean evalCondicionesPoda()
