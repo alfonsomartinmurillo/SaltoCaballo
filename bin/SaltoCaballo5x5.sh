@@ -1,0 +1,26 @@
+#SCRIPT PARA EJECUTAR                   
+java SaltoCaballo -n 5 -x 1 -y 1 -f 5x5-1_1.txt  
+java SaltoCaballo -n 5 -x 1 -y 2 -f 5x5-1_2.txt  
+java SaltoCaballo -n 5 -x 1 -y 3 -f 5x5-1_3.txt  
+java SaltoCaballo -n 5 -x 1 -y 4 -f 5x5-1_4.txt  
+java SaltoCaballo -n 5 -x 1 -y 5 -f 5x5-1_5.txt  
+java SaltoCaballo -n 5 -x 2 -y 1 -f 5x5-2_1.txt  
+java SaltoCaballo -n 5 -x 2 -y 2 -f 5x5-2_2.txt  
+java SaltoCaballo -n 5 -x 2 -y 3 -f 5x5-2_3.txt  
+java SaltoCaballo -n 5 -x 2 -y 4 -f 5x5-2_4.txt  
+java SaltoCaballo -n 5 -x 2 -y 5 -f 5x5-2_5.txt  
+java SaltoCaballo -n 5 -x 3 -y 1 -f 5x5-3_1.txt  
+java SaltoCaballo -n 5 -x 3 -y 2 -f 5x5-3_2.txt  
+java SaltoCaballo -n 5 -x 3 -y 3 -f 5x5-3_3.txt  
+java SaltoCaballo -n 5 -x 3 -y 4 -f 5x5-3_4.txt  
+java SaltoCaballo -n 5 -x 3 -y 5 -f 5x5-3_5.txt  
+java SaltoCaballo -n 5 -x 4 -y 1 -f 5x5-4_1.txt  
+java SaltoCaballo -n 5 -x 4 -y 2 -f 5x5-4_2.txt  
+java SaltoCaballo -n 5 -x 4 -y 3 -f 5x5-4_3.txt  
+java SaltoCaballo -n 5 -x 4 -y 4 -f 5x5-4_4.txt  
+java SaltoCaballo -n 5 -x 4 -y 5 -f 5x5-4_5.txt  
+java SaltoCaballo -n 5 -x 5 -y 1 -f 5x5-5_1.txt  
+java SaltoCaballo -n 5 -x 5 -y 2 -f 5x5-5_2.txt  
+java SaltoCaballo -n 5 -x 5 -y 3 -f 5x5-5_3.txt  
+java SaltoCaballo -n 5 -x 5 -y 4 -f 5x5-5_4.txt  
+java SaltoCaballo -n 5 -x 5 -y 5 -f 5x5-5_5.txt  

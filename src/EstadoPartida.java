@@ -8,8 +8,6 @@ import java.util.Date;
 
 import sun.management.counter.LongCounter;
 
-
-
 public class EstadoPartida
 
 {
@@ -27,7 +25,7 @@ public class EstadoPartida
 	public int numPosValidas;
 	
 	
-	
+	//CONSTRUCTOR POR DEFECTO.
 	public EstadoPartida()	
 	{
 		try
@@ -40,12 +38,13 @@ public class EstadoPartida
 		}
 		catch (FileNotFoundException exc)
 		{
-			// TODO Auto-generated catch block
+			
 			System.out.println(exc.toString());
 		}
 		
 	}
 	
+	//CONSTRUCTOR DE LA CLASE DE TIPO ESTADOPARTIDA EN BASE A PARÁMETROS NECESARIOS
 	public EstadoPartida(int xIni,int yIni, int dim, Boolean mTraza, Boolean tSoluciones,PrintStream miConsola)	
 	{
 		//VARIABLES TEMPORALES
@@ -53,21 +52,16 @@ public class EstadoPartida
 		int idy;
 		
 		//CUERPO
-				
+		
+		//CONVERSIÓN DE COORDENADAS A ÍNDICE 0
 		xActual=xIni-1; //Posición x de partida. Resto -1 para adaptarlo a matriz con índice que empieza en 0.  
 		yActual=yIni-1; //Posición y de partida. Resto -1 para adaptarlo a matriz con índice que empieza en 0.
+		
 		modoTraza=mTraza;
 		modotodasSoluciones=tSoluciones;
 		this.miConsola=miConsola;
 		Tablero=new int[dim][dim]; //Creación de la matriz que representa el tablero;
-		//Inicializar el Tablero todo a 0.
-		for (idx=0;idx<dim;idx++)
-		{
-			for (idy=0;idy<dim;idy++)
-			{
-				Tablero[idx][idy]=0;
-			}
-		}
+		
 		//Establezco la primera posición del caballo en el tablero
 		Tablero[xActual][yActual]=1;
 		dimTablero=dim; //Establezco la dimensión del Tablero
@@ -94,78 +88,85 @@ public class EstadoPartida
 		} 
 		catch (FileNotFoundException exc)
 		{
-			// TODO Auto-generated catch block
+			
 			miConsola.println(exc.toString());
 		}
 		
 		
 	}
 	
+	
+	//Función que focaliza todo lo común a los diferentes constructores
 	public void initEstadoPartida()	throws UnsupportedEncodingException, FileNotFoundException
 	{
 		//Función que focaliza todo lo común a los diferentes constructores
 		esSolucion=false;
-		/*
-		//FICHERO PARA GRABAR LA SALIDA
-		File file = new File("salida.txt");
-		FileOutputStream fos = new FileOutputStream(file);
-		//miConsola=new PrintStream(fos,true,"UTF-8");
-		miConsola=new PrintStream(System.out,true,"UTF-8");
-		*/
-		
 	}
 	
-	public EstadoPartida evalPartida(ArrayList<EstadoPartida> ListaSoluciones)
+	//TODO Limpiar y Comentar
+	public EstadoPartida evalPartida()
 	{
-		//TODO implementar que la función retorne cuando el par. de entrada sea el de una única solución.
-		//variables locales
+		
+		//VARIABLES LOCALES
 		int x;
+		
 		//Salida en caso de camino válido. Si el camino obtenido corresponde con el tamaño del tablero, es que hemos
 		//ocupado todas las posiciones.
+		//SALIDA VÁLIDA
 		if (lCamino==dimTablero*dimTablero)
 			{
 				esSolucion=true;
-				ListaSoluciones.add(this);
+				//AÑADO LA SOLUCIÓN A LA LISTA DE SOLUCIONES
+				SaltoCaballo.listaSoluciones.add(this);
 				Date fechaHora=new Date(); 
-				miConsola.print(" --- " + fechaHora.toString() + " Sol " +Integer.toString(ListaSoluciones.size()));
-				SaltoCaballo.longCamino=0;
-				return this;
+				miConsola.println(fechaHora.toString() + " Solución - " + Integer.toString(SaltoCaballo.listaSoluciones.size()));
+				miConsola.println("----------------------------------------------------------");
+					
+				if (modoTraza)
+				{
+					miConsola.println(fechaHora.toString() +  " Detalle de la traza");
+					miConsola.println("----------------------------------------------------------");
+					SaltoCaballo.PintarSolucion(this);
+				}
+				else
+				{
+					PintarTablero();
+					miConsola.println();
+				}
+					miConsola.println();
+
+				
 				
 			}
 		else
-			//Obtención de siguientes ensayos
+			//OBTENCIÓN DE SIGUIENTES POSICIONES
 			//
 			
 		{
-			if ((ListaSoluciones.size()==1 && modotodasSoluciones==false)!=true) //O TENGO UNA SOLUCIÓN Y SOLO QUIERO UNA O CONTINUO
-			{
 			
 				//Array para la obtención de las siguientes posiciones disponibles
 				ArrayList<EstadoPartida> ListaEstadosSiguientes;
-								
-				SaltoCaballo.longCamino=lCamino;//Actualizo el nuevo camino
-				miConsola.print(" - " + Integer.toString(lCamino));
-				//miConsola.print(" longCamino: " + Integer.toString(SaltoCaballo.longCamino));
 				ListaEstadosSiguientes=SaltoCaballo.genCompleciones(this);
 				x=0;
 				while (x<ListaEstadosSiguientes.size()) //realizamos este recorrido mientras tenga ensayos que cumplan
 				{
-					ListaEstadosSiguientes.get(x).evalPartida(ListaSoluciones);
+					ListaEstadosSiguientes.get(x).evalPartida();
 					
-					if (ListaSoluciones.size()==1  && modotodasSoluciones==false) break;// SI HE ENCONTRADO UNA SOLUCIÓN ROMPO EL BUCLE PARA SALIR LO ANTES POSIBLE
-						
+					if (SaltoCaballo.listaSoluciones.size()==1  && modotodasSoluciones==false) break;// SI HE ENCONTRADO UNA SOLUCIÓN ROMPO EL BUCLE PARA SALIR LO ANTES POSIBLE
 					x++;
 					
 				}
-			}
+				//YA HE ACABADO CON MI LISTA DE ESTADOS, ASÍ QUE ME LOS CEPILLO.
+				ListaEstadosSiguientes=null;
+		
 			
 			
 		}
-			miConsola.println();
 			return this;
 	
 	}
 	
+	//TODO Limpiar y Comentar
 	public Casilla[] copiaCamino()
 	{
 		int x;
@@ -179,6 +180,7 @@ public class EstadoPartida
 			return tCamino;
 	}
 	
+	//MÉTODO QUE REPLICA EL TABLERO
 	public int[][] copiaTablero()
 	{
 		//variables temporales;
@@ -199,6 +201,7 @@ public class EstadoPartida
 	
 	
 	
+	//TODO Limpiar y Comentar
 	public void PintarTablero()
 	{
 		//variables temporales;
@@ -226,6 +229,7 @@ public class EstadoPartida
 		}
 	}
 	
+	//TODO Limpiar y Comentar
 	public void PintarCamino()
 	{
 		int x;

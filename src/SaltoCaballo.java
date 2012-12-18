@@ -18,10 +18,13 @@ public class SaltoCaballo {
 	static Boolean modoTodasSoluciones; //Establece si debemos de obtener todas las soluciones o únicamente la primera.
 	static ArrayList<EstadoPartida> listaSoluciones;
 	static int longCamino;
+	static String nomFicheroSalida;
+	static int paramSalida;
 	
 	//Otras variables
 	static PrintStream miConsola;
 	
+	//TODO Limpiar y Comentar
 	public static void main(String[] args) throws UnsupportedEncodingException, FileNotFoundException 
 	{
 		
@@ -35,30 +38,43 @@ public class SaltoCaballo {
 		modoTraza=false;
 		modoTodasSoluciones=false; 
 		longCamino=0;
+		nomFicheroSalida=new String("salida.txt");
+		paramSalida=0; //POR DEFECTO LA SALIDA ES POR CONSOLA. 0 - CONSOLA 1 - FICHERO.
 		
-		//FICHERO PARA GRABAR LA SALIDA
-		File file = new File("salida.txt");
-		FileOutputStream fos = new FileOutputStream(file);
-		miConsola=new PrintStream(fos,true,"UTF-8");
-		//miConsola=new PrintStream(System.out,true,"UTF-8");
+		//OBJETO FECHAHORA PARA IR GRABANDO LOS EVENTOS DE LA APLICACIÓN
 		Date fechaHora=new Date();
-					
+						
 		// 1 - Evaluar que los parámetros enviados son los correctos.
 		if (evalParametros(args)==false)
 			{
-				miConsola.println("Los parámetros suministrados no son correctos");
-				miConsola.println("El programa finalizará su ejecución");
+				
+				System.out.println("Los parametros suministrados no son correctos");
+				System.out.println("El programa finalizará su ejecución");
 				System.exit(0);
 			}
 		
-		// 2 - configuración temporal de parámetros de entrada
+		//CONFIGURACIÓN DE CONSOLA DE SALIDA
+		if (paramSalida==0)
+		{
+			miConsola=new PrintStream(System.out,true,"UTF-8");
+			
+		}
+		else
+		{
+			File file = new File(nomFicheroSalida);
+			FileOutputStream fos = new FileOutputStream(file);
+			miConsola=new PrintStream(fos,true,"UTF-8");	
+		}
 				
-		//Creación de la partida
+				
+		//CREACIÓN DE LA PARTIDA
 		listaSoluciones= new ArrayList<EstadoPartida>();
+		//COMIENZA MI PARTIDA
 		EstadoPartida estadoInicial=new EstadoPartida(xInicio,yInicio,N,modoTraza,modoTodasSoluciones,miConsola);
-		miConsola.println(fechaHora.toString() + " Comienza el Proceso de generación de soluciones: ");
-		estadoInicial.evalPartida(listaSoluciones);
-		miConsola.println(fechaHora.toString() + " Finaliza el Proceso de generación de soluciones");
+		
+		miConsola.println(fechaHora.toString() + " Inicio del Proceso de generación de soluciones: ");
+		estadoInicial.evalPartida();
+		miConsola.println(fechaHora.toString() + " Finalización del Proceso de generación de soluciones");
 		
 		//FINALIZAR EL PROGRAMA SI NO HEMOS ENCONTRADO SOLUCIONES
 		if (listaSoluciones.size()==0)
@@ -68,39 +84,10 @@ public class SaltoCaballo {
 		
 		}
 		
-		miConsola.println( fechaHora.toString() + " Comienza el proceso de listado de soluciones ");
 		
-		for (x=0;x<listaSoluciones.size();x++)
-		{
-			miConsola.println(fechaHora.toString() +  " Solución Nº : " + Integer.toString(x+1) );
-			miConsola.println("----------------------------------------------------------");
-			
-			if (modoTraza)
-			{
-				miConsola.println(fechaHora.toString() +  " Detalle de la traza");
-				miConsola.println("----------------------------------------------------------");
-				PintarSolucion(listaSoluciones.get(x));
-			}
-			else
-			{
-				
-				
-				listaSoluciones.get(x).PintarTablero();
-				miConsola.println();
-				listaSoluciones.get(x).PintarCamino();
-				
-			}
-			
-			miConsola.println();
-			
-		}
-		
-		miConsola.println(fechaHora.toString() +  " Finaliza el proceso de listado de soluciones ");
-		
-
-
 	}
 	
+	//TODO Limpiar y Comentar
 	public static void PintarSolucion(EstadoPartida solPartida)
 	{
 		
@@ -165,8 +152,7 @@ public class SaltoCaballo {
 		
 		//FIXME -n 5 -x 3 y 3 no funciona. controlarlo.
 		//FIXME -p 5 -x 3 y 3 no funciona. controlarlo.
-		//TODO Implementar la gestión de parámetros
-		//TODO Implementar un Try Catch que ante un error devuelva el false. Ej: pongo -n al final y no pongo valor, dará un error.
+
 		
 		//VARIABLES TEMPORALES
 		int x=0;
@@ -201,12 +187,24 @@ public class SaltoCaballo {
 						}
 						else
 						{
-							if (args[x].toString().toLowerCase().equals("-t")) 
-								modoTraza=true;
+							//OBTENDO SI TRABAJO O NO EN MODO TRAZA
+							if (args[x].toString().toLowerCase().equals("-t")) modoTraza=true;
 							else
 							{
+								//OBTENGO SI DESEO TODAS LAS SOLUCIONES O NO
 								if (args[x].toString().toLowerCase().equals("-a")) modoTodasSoluciones=true;
+								else
+								{
+									if (args[x].toString().toLowerCase().equals("-f")) //CAPTO EL NOMBRE DEL FICHERO 
+									{
+										paramSalida=1; //DESEO LA SALIDA POR FICHERO
+										nomFicheroSalida=args[x+1];
+										x++;
+									}
+									
+								}
 							}
+							
 								
 						}
 						
@@ -229,14 +227,7 @@ public class SaltoCaballo {
 		
 	}
 	
-	public EstadoPartida genCamino()
-	{
-		//TODO Implementar la función recursiva principal de BackTracking
-		return new EstadoPartida();
-		
-	}
-	
-	//TODO generar tratamiento de excepciones para ver que está pasando
+	//TODO Limpiar y Comentar
 	public static ArrayList<EstadoPartida> genCompleciones(EstadoPartida EstActual)
 	{
 
@@ -282,6 +273,7 @@ public class SaltoCaballo {
 				ListaEstadosSiguientes.remove(idxUmbral);
 				
 			}
+				
 			
 			
 			
@@ -294,11 +286,14 @@ public class SaltoCaballo {
 		}
 		finally
 		{
+			//LIMPIO Y DEVUELVO
+			ListaEstadosSiguientes=null;
 			return ListaEstadosSiguientesOrden; //Temporal
 		}
 		
 		}
 	
+	//TODO Limpiar y Comentar
 	public static void genNuevoJuego(int x,int y,ArrayList<EstadoPartida> ListaEstadosSiguientes, EstadoPartida EstActual)
 	{
 		//Variables Locales
@@ -314,8 +309,15 @@ public class SaltoCaballo {
 			nuevoEstadoPartida.Camino[nuevoEstadoPartida.lCamino-1].xPos=x;
 			nuevoEstadoPartida.Camino[nuevoEstadoPartida.lCamino-1].yPos=y;
 			nuevoEstadoPartida.Tablero[x][y]=nuevoEstadoPartida.lCamino;
-			ListaEstadosSiguientes.add(nuevoEstadoPartida);
+			//INTENTO ACORTAR EL NÚMERO DE ESTADOS SIGUIENTES A EVALUAR
 			nuevoEstadoPartida.numPosValidas=getNumPosValidas(nuevoEstadoPartida);
+			//SI NO HAY POSICIONES SIGUIENTES Y NO ESTOY EN UNA SOLUCIÓN AGREGO. 
+			if (((nuevoEstadoPartida.numPosValidas==0) && (nuevoEstadoPartida.lCamino<nuevoEstadoPartida.dimTablero))==false)
+			{
+				ListaEstadosSiguientes.add(nuevoEstadoPartida);
+			}
+			
+				
 			nuevoEstadoPartida=null;
 			
 		}
@@ -323,6 +325,7 @@ public class SaltoCaballo {
 		
 	}
 	
+	//TODO Limpiar y Comentar
 	public static int getNumPosValidas(EstadoPartida estPartida)
 	
 	{
@@ -344,6 +347,8 @@ public class SaltoCaballo {
 		return numPosValidas;
 	}
 	
+	
+	//TODO Limpiar y Comentar
 	public boolean evalCondicionesPoda()
 	{
 		//
