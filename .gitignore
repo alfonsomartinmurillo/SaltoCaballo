@@ -1,4 +1,3 @@
+*.zip
 
-*.class
-
-bin/SaltoCaballo.class
+*.txt
