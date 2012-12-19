@@ -33,6 +33,7 @@ public class SaltoCaballo {
 		
 		//CONFIGURACIONES POR DEFECTO DE LA APLICACIÓN
 		N=8; 
+		
 		xInicio=1; 
 		yInicio=1; 
 		modoTraza=false;
